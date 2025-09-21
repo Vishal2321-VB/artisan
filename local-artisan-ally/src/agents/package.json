@@ -1,0 +1,31 @@
+{
+  "name": "gen-ai-hack",
+  "version": "1.0.0",
+  "description": "AI-powered marketplace for local artists",
+  "main": "index.js",
+"scripts": {
+  "start": "react-scripts start",
+  "build": "react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject",
+  "dev": "react-scripts start"
+}
+
+  "keywords": [
+    "AI",
+    "Marketplace",
+    "Artists",
+    "Next.js"
+  ],
+  "author": "Vishal VB",
+  "license": "MIT",
+  "dependencies": {
+    "next": "13.5.6",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "eslint": "8.46.0",
+    "eslint-config-next": "13.5.6"
+  }
+}

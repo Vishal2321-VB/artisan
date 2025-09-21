@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Service Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+        .test-section h3 {
+            margin-top: 0;
+        }
+        .result {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .info {
+            background-color: #cce7ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Service Integration Test</h1>
+        <p>This page tests the integration with Hugging Face AI services.</p>
+        
+        <div id="info" class="status info">
+            <strong>Important:</strong> To run this test successfully, you need to:
+            <ol>
+                <li>Get a free Hugging Face API token from <a href="https://huggingface.co/settings/tokens" target="_blank">https://huggingface.co/settings/tokens</a></li>
+                <li>Add it to your <code>.env</code> file as <code>VITE_HF_API_TOKEN=your_token_here</code></li>
+                <li>Restart the development server</li>
+            </ol>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <button id="runTest">Run AI Service Test</button>
+        
+        <div id="results" style="display: none;">
+            <h2>Test Results</h2>
+            
+            <div class="test-section">
+                <h3>1. Environment Check</h3>
+                <div id="envResult" class="result">Not run yet</div>
+            </div>
+            
+            <div class="test-section">
+                <h3>2. Story Generation</h3>
+                <div id="storyResult" class="result">Not run yet</div>
+            </div>
+            
+            <div class="test-section">
+                <h3>3. Trend Analysis</h3>
+                <div id="trendResult" class="result">Not run yet</div>
+            </div>
+            
+            <div class="test-section">
+                <h3>4. Price Determination</h3>
+                <div id="priceResult" class="result">Not run yet</div>
+            </div>
+            
+            <div class="test-section">
+                <h3>5. Recommendations</h3>
+                <div id="recommendationsResult" class="result">Not run yet</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the AIService
+        import { AIService } from './AIService';
+        
+        document.getElementById('runTest').addEventListener('click', async function() {
+            const button = this;
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            // Disable button and show loading status
+            button.disabled = true;
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status loading';
+            statusDiv.textContent = 'Running tests... Please wait, this may take a moment.';
+            resultsDiv.style.display = 'none';
+            
+            try {
+                // Test 1: Environment Check
+                updateResult('envResult', 'Checking environment...');
+                const apiToken = import.meta.env.VITE_HF_API_TOKEN;
+                if (!apiToken || apiToken === 'your_actual_huggingface_api_token_here') {
+                    throw new Error('Hugging Face API token not found or not configured in .env file');
+                }
+                updateResult('envResult', '✅ API token found');
+                
+                // Test data
+                const testData = {
+                    product_name: "Handcrafted Ceramic Vase",
+                    category: "Pottery & Ceramics",
+                    description: "Beautiful hand-thrown ceramic vase with intricate glazing patterns",
+                    tags: ["handmade", "ceramic", "vase", "decorative"],
+                    price: 45.99
+                };
+                
+                // Test 2: Story Generation
+                updateResult('storyResult', 'Generating story...');
+                const story = await AIService.generateStory(testData);
+                updateResult('storyResult', story.substring(0, 200) + '...');
+                
+                // Test 3: Trend Analysis
+                updateResult('trendResult', 'Analyzing trends...');
+                const trendData = await AIService.analyzeTrend(testData);
+                updateResult('trendResult', `Trend Score: ${trendData.trend_score}\nRecommendations: ${trendData.marketing_recommendations.slice(0, 3).join('; ')}`);
+                
+                // Test 4: Price Determination
+                updateResult('priceResult', 'Determining price...');
+                const priceData = {
+                    ...testData,
+                    trend_score: trendData.trend_score
+                };
+                const price = await AIService.determinePrice(priceData);
+                updateResult('priceResult', `Recommended Price: ₹${price}`);
+                
+                // Test 5: Recommendations
+                updateResult('recommendationsResult', 'Generating recommendations...');
+                const recommendations = await AIService.generateRecommendations({
+                    story,
+                    trend_score: trendData.trend_score,
+                    recommended_price: price,
+                    marketing_recommendations: trendData.marketing_recommendations
+                });
+                updateResult('recommendationsResult', recommendations.slice(0, 3).join('\n\n'));
+                
+                // Show success status
+                statusDiv.className = 'status success';
+                statusDiv.textContent = 'All tests completed successfully!';
+                resultsDiv.style.display = 'block';
+            } catch (error) {
+                console.error('Test failed:', error);
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `Test failed: ${error.message}`;
+                resultsDiv.style.display = 'block';
+            } finally {
+                button.disabled = false;
+            }
+        });
+        
+        function updateResult(elementId, content) {
+            document.getElementById(elementId).textContent = content;
+        }
+    </script>
+</body>
+</html>

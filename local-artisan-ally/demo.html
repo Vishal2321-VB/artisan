@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Services Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+        .result {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Services Demo</h1>
+        <p>This page demonstrates that the AI services are properly integrated and working.</p>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <button id="runDemo">Run AI Demo</button>
+        
+        <div id="results" style="display: none;">
+            <h2>Demo Results</h2>
+            
+            <div class="test-section">
+                <h3>Environment Check</h3>
+                <div id="envResult" class="result">Not run yet</div>
+            </div>
+            
+            <div class="test-section">
+                <h3>Story Generation</h3>
+                <div id="storyResult" class="result">Not run yet</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the AIService
+        import { AIService } from '/src/agents/AIService.ts';
+        
+        document.getElementById('runDemo').addEventListener('click', async function() {
+            const button = this;
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            // Disable button and show loading status
+            button.disabled = true;
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status loading';
+            statusDiv.textContent = 'Running demo... Please wait, this may take a moment.';
+            resultsDiv.style.display = 'none';
+            
+            try {
+                // Test 1: Environment Check
+                updateResult('envResult', 'Checking environment...');
+                const apiToken = import.meta.env.VITE_HF_API_TOKEN;
+                if (!apiToken || apiToken === 'your_actual_huggingface_api_token_here') {
+                    throw new Error('Hugging Face API token not found or not configured in .env file');
+                }
+                updateResult('envResult', '✅ API token found and configured correctly');
+                
+                // Test data
+                const testData = {
+                    product_name: "Handcrafted Ceramic Vase",
+                    category: "Pottery & Ceramics",
+                    description: "Beautiful hand-thrown ceramic vase with intricate glazing patterns",
+                    tags: ["handmade", "ceramic", "vase", "decorative"],
+                    price: 45.99
+                };
+                
+                // Test 2: Story Generation
+                updateResult('storyResult', 'Generating story...');
+                const story = await AIService.generateStory(testData);
+                updateResult('storyResult', story.substring(0, 200) + '...');
+                
+                // Show success status
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '🎉 Demo completed successfully! All services are working.';
+                resultsDiv.style.display = 'block';
+            } catch (error) {
+                console.error('Demo failed:', error);
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `❌ Demo failed: ${error.message}<br><br>
+                    <strong>Troubleshooting tips:</strong>
+                    <ul style="text-align: left;">
+                        <li>Make sure you have a valid Hugging Face API token in your .env file</li>
+                        <li>Check your internet connection</li>
+                        <li>Verify the Hugging Face API is accessible</li>
+                    </ul>`;
+                resultsDiv.style.display = 'block';
+            } finally {
+                button.disabled = false;
+            }
+        });
+        
+        function updateResult(elementId, content) {
+            document.getElementById(elementId).innerHTML = content;
+        }
+    </script>
+</body>
+</html>

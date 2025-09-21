@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+        }
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .preview-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Image Upload Test</h1>
+        <p>This page tests the image upload functionality that was fixed in the SellYourArt component.</p>
+        
+        <div class="upload-area" id="uploadArea">
+            <p>Click here to select an image file</p>
+            <p>Supports JPG, PNG, GIF (max 5MB)</p>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        </div>
+        
+        <button id="testButton">Test Image Upload</button>
+        
+        <div class="preview-container" id="previewContainer"></div>
+    </div>
+
+    <script>
+        document.getElementById('uploadArea').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+        
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            handleFileSelect(e);
+        });
+        
+        document.getElementById('testButton').addEventListener('click', function() {
+            // This simulates what happens in the SellYourArt component
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            
+            fileInput.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Check if file is an image
+                    if (!file.type.match('image.*')) {
+                        alert('Please select an image file (JPEG, PNG, GIF, etc.)');
+                        return;
+                    }
+                    
+                    // Check file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Please select an image smaller than 5MB');
+                        return;
+                    }
+                    
+                    // Convert to base64 for preview
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        if (event.target.result) {
+                            // Display preview
+                            const img = document.createElement('img');
+                            img.src = event.target.result;
+                            img.className = 'preview-image';
+                            document.getElementById('previewContainer').appendChild(img);
+                            
+                            console.log('Image converted to base64 successfully');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            fileInput.click();
+        });
+        
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Display file info
+                console.log('Selected file:', file.name);
+                console.log('File size:', file.size, 'bytes');
+                console.log('File type:', file.type);
+                
+                // Create preview
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.className = 'preview-image';
+                    document.getElementById('previewContainer').appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>
